@@ -434,7 +434,7 @@ void I_AtExit(atexit_func_t func, dboolean run_on_error)
  * during the exit process (i.e. after exit() has already been called)
  * Prevent infinitely recursive exits -- killough
  */
-
+static void I_Quit (void);
 void I_SafeExit(int rc)
 {
   atexit_listentry_t *entry;
@@ -447,7 +447,12 @@ void I_SafeExit(int rc)
 
     if (rc == 0 || entry->run_on_error)
     {
+<<<<<<< HEAD
       entry->func();
+#ifdef __ANDROID__
+      Z_Close();
+	  I_Quit();
+#endif
     }
   }
 
@@ -587,7 +592,11 @@ void I_SetProcessPriority(void)
 }
 
 //int main(int argc, const char * const * argv)
+#ifdef __ANDROID__
+int main_android(int argc, char **argv)
+#else
 int main(int argc, char **argv)
+#endif
 {
 #ifdef SECURE_UID
   /* First thing, revoke setuid status (if any) */
