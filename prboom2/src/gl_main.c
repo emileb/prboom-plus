@@ -217,7 +217,7 @@ void gld_InitTextureParams(void)
 
   for (i = 0; i < MIP_COUNT; i++)
   {
-#ifdef USE_GLU_MIPMAP
+#if defined(USE_GLU_MIPMAP) || defined (__ANDROID__)
     tex_filter[i].mipmap     = params[*var[i]].mipmap;
 #else
     tex_filter[i].mipmap     = false;
@@ -386,7 +386,9 @@ void gld_Init(int width, int height)
   glClearDepth(1.0f);
 
   glEnable(GL_BLEND);
+#ifndef __ANDROID__
   glEnable(GL_DEPTH_CLAMP_NV);
+#endif
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // proff_dis

@@ -393,7 +393,11 @@ const char* I_GetTempDir(void)
 // cph - V.Aguilar (5/30/99) suggested return ~/.lxdoom/, creating
 //  if non-existant
 // cph 2006/07/23 - give prboom+ its own dir
+#ifdef __ANDROID__
+static const char prboom_dir[] = {"/user_files/prboom-plus"}; // Not hidden so not to confuse mobile users
+#else
 static const char prboom_dir[] = {"/.prboom-plus"}; // Mead rem extra slash 8/21/03
+#endif
 
 const char *I_DoomExeDir(void)
 {
@@ -476,6 +480,9 @@ char* I_FindFileInternal(const char* wfname, const char* ext, dboolean isStatic)
     {"/usr/share/games/doom"},
     {"/usr/local/share/doom"},
     {"/usr/share/doom"},
+#ifdef __ANDROID__
+    {"./res/"},
+#endif
   }, *search;
 
   static size_t num_search;

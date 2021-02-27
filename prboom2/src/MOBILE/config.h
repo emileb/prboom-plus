@@ -8,6 +8,8 @@
 /* Define to the version of this package. */
 #define PACKAGE_VERSION "2.5.1.7"
 
+#define PACKAGE_HOMEPAGE ""
+
 #ifdef DEBUG
 
 
@@ -71,7 +73,7 @@
 #define HIGHRES 1
 //#define GL_DOOM 1
 //#define USE_GLU_TESS 1
-#define USE_GLU_IMAGESCALE 1
+//#define USE_GLU_IMAGESCALE 1
 //#define USE_GLU_MIPMAP 1
 #define DISABLE_DOUBLEBUFFER
 

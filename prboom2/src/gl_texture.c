@@ -813,6 +813,56 @@ void gld_SetTexClamp(GLTexture *gltexture, unsigned int flags)
   }
 }
 
+#ifdef __ANDROID__
+static void GL_ResampleTexture (uint32_t *in, uint32_t inwidth, uint32_t inheight, uint32_t *out,  uint32_t outwidth, uint32_t outheight)
+{
+	//LOGI("GL_ResampleTexture %dx%d -> %dx%d",inwidth,inheight,outwidth,outheight);
+
+	int		i, j;
+	uint32_t	*inrow, *inrow2;
+	uint32_t	frac, fracstep;
+	uint8_t		*pix1, *pix2, *pix3, *pix4;
+	uint32_t	*p1 = (uint32_t*)malloc(sizeof(uint32_t) * outwidth );
+	uint32_t	*p2 = (uint32_t*)malloc(sizeof(uint32_t) * outwidth );
+
+	fracstep = inwidth*0x10000/outwidth;
+
+	frac = fracstep>>2;
+	for (i=0 ; i<outwidth ; i++)
+	{
+		p1[i] = 4*(frac>>16);
+		frac += fracstep;
+	}
+	frac = 3*(fracstep>>2);
+	for (i=0 ; i<outwidth ; i++)
+	{
+		p2[i] = 4*(frac>>16);
+		frac += fracstep;
+	}
+
+	for (i=0 ; i<outheight ; i++, out += outwidth)
+	{
+		inrow = in + inwidth*(int)((i+0.25)*inheight/outheight);
+		inrow2 = in + inwidth*(int)((i+0.75)*inheight/outheight);
+		frac = fracstep >> 1;
+		for (j=0 ; j<outwidth ; j++)
+		{
+			pix1 = (uint8_t *)inrow + p1[j];
+			pix2 = (uint8_t *)inrow + p2[j];
+			pix3 = (uint8_t *)inrow2 + p1[j];
+			pix4 = (uint8_t *)inrow2 + p2[j];
+			((uint8_t *)(out+j))[0] = (pix1[0] + pix2[0] + pix3[0] + pix4[0])>>2;
+			((uint8_t *)(out+j))[1] = (pix1[1] + pix2[1] + pix3[1] + pix4[1])>>2;
+			((uint8_t *)(out+j))[2] = (pix1[2] + pix2[2] + pix3[2] + pix4[2])>>2;
+			((uint8_t *)(out+j))[3] = (pix1[3] + pix2[3] + pix3[3] + pix4[3])>>2;
+		}
+	}
+
+	free(p1);
+	free(p2);
+}
+#endif
+
 int gld_BuildTexture(GLTexture *gltexture, void *data, dboolean readonly, int width, int height)
 {
   int result = false;
@@ -824,6 +874,10 @@ int gld_BuildTexture(GLTexture *gltexture, void *data, dboolean readonly, int wi
   tex_height = gld_GetTexDimension(height);
   tex_buffer_size = tex_width * tex_height * 4;
 
+#ifdef __ANDROID__
+  glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, (gltexture->flags & GLTEXTURE_MIPMAP) ? GL_TRUE : GL_FALSE);
+#endif
+
   //your video is modern
   if (gl_arb_texture_non_power_of_two)
   {
@@ -833,9 +887,9 @@ int gld_BuildTexture(GLTexture *gltexture, void *data, dboolean readonly, int wi
     glTexImage2D( GL_TEXTURE_2D, 0, gl_tex_format,
       tex_width, tex_height,
       0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-
+#ifndef __ANDROID__
     gld_RecolorMipLevels(data);
-
+#endif
     gld_SetTexFilters(gltexture);
 
     result = true;
@@ -866,12 +920,14 @@ int gld_BuildTexture(GLTexture *gltexture, void *data, dboolean readonly, int wi
       {
         goto l_exit;
       }
-
+#ifdef __ANDROID__
+      GL_ResampleTexture(data,width, height,tex_buffer, tex_width, tex_height);
+#else
       gluScaleImage(GL_RGBA, width, height,
         GL_UNSIGNED_BYTE, data,
         tex_width, tex_height,
         GL_UNSIGNED_BYTE, tex_buffer);
-
+#endif
       glTexImage2D( GL_TEXTURE_2D, 0, gl_tex_format,
         tex_width, tex_height,
         0, GL_RGBA, GL_UNSIGNED_BYTE, tex_buffer);
@@ -913,8 +969,9 @@ int gld_BuildTexture(GLTexture *gltexture, void *data, dboolean readonly, int wi
           0, GL_RGBA, GL_UNSIGNED_BYTE, tex_buffer);
       }
     }
-
+#ifndef __ANDROID__ //Dont turn this off
     gltexture->flags &= ~GLTEXTURE_MIPMAP;
+#endif
     gld_SetTexFilters(gltexture);
     result = true;
   }

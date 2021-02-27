@@ -442,7 +442,11 @@ default_t defaults[] =
   {"snd_soundfont",{NULL, &snd_soundfont},{0,"TimGM6mb.sf2"},UL,UL,def_str,ss_none}, // soundfont name for synths that support it
 #else
   {"snd_midiplayer",{NULL, &snd_midiplayer},{0,"sdl"},UL,UL,def_str,ss_none},
+ #ifdef __ANDROID__
+  {"snd_soundfont",{NULL, &snd_soundfont},{0,"./audiopack/snd_fluidsynth/fluidsynth.sf2"},UL,UL,def_str,ss_none}, // soundfont name for synths that support it
+#else
   {"snd_soundfont",{NULL, &snd_soundfont},{0,"/usr/share/sounds/sf3/default-GM.sf3"},UL,UL,def_str,ss_none}, // soundfont name for synths that support it
+#endif
 #endif
   {"snd_mididev",{NULL, &snd_mididev},{0,""},UL,UL,def_str,ss_none}, // midi device to use for portmidiplayer
   {"lowpass_filter",{&lowpass_filter},{0},0,1,
@@ -1475,6 +1479,9 @@ void M_SaveDefaults (void)
       }
     }
 
+#ifdef __ANDROID__
+  fflush(f);
+#endif
   fclose (f);
 }
 

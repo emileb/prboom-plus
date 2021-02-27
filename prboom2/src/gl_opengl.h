@@ -38,7 +38,7 @@
 #include "config.h"
 #endif
 
-#define USE_VERTEX_ARRAYS
+//#define USE_VERTEX_ARRAYS // this is way slower on Android
 //#define USE_VBO
 
 #include <SDL.h>

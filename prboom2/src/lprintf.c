@@ -63,6 +63,11 @@ int cons_output_mask = -1;        /* all output enabled */
  */
 #define MAX_MESSAGE_SIZE 2048
 
+#ifdef __ANDROID__
+#include <android/log.h>
+#include "LogWritter.h"
+#endif
+
 int lprintf(OutputLevels pri, const char *s, ...)
 {
   int r=0;
@@ -73,6 +78,14 @@ int lprintf(OutputLevels pri, const char *s, ...)
   va_start(v,s);
   doom_vsnprintf(msg,sizeof(msg),s,v);    /* print message in buffer  */
   va_end(v);
+
+#ifdef __ANDROID__
+    if (lvl&cons_error_mask)
+        __android_log_print(ANDROID_LOG_ERROR,"PrBoom","%s",msg);
+    else
+        __android_log_print(ANDROID_LOG_INFO,"PrBoom","%s",msg);
+    LogWritter_Write(msg);
+#endif
 
   if (lvl&cons_output_mask)               /* mask output as specified */
   {

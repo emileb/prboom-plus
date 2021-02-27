@@ -531,6 +531,10 @@ void I_FinishUpdate (void)
   if (V_GetMode() == VID_MODEGL) {
     // proff 04/05/2000: swap OpenGL buffers
     gld_Finish();
+
+#ifdef __ANDROID__
+    gld_BindTexture(NULL,0);
+#endif
     return;
   }
 #endif
@@ -579,6 +583,10 @@ void I_FinishUpdate (void)
 
   // Draw!
   SDL_RenderPresent(sdl_renderer);
+
+#ifdef __ANDROID__ // The touch controls change the viewport, call this to fix. This function does not exist in SDL2
+      SDL_ForceupdateViewport(sdl_renderer);
+#endif
 }
 
 //
@@ -1198,6 +1206,10 @@ void I_UpdateVideoMode(void)
   if (V_GetMode() == VID_MODEGL)
   {
 #ifdef GL_DOOM
+#ifdef __ANDROID__ //Tegra has only 16 bit depth buffer
+    gl_depthbuffer_bits = 16;
+#endif
+
     SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 0 );
     SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 0 );
     SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 0 );
@@ -1212,6 +1224,11 @@ void I_UpdateVideoMode(void)
     SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, gl_depthbuffer_bits );
     SDL_GL_SetAttribute( SDL_GL_STENCIL_SIZE, 8 );
 
+#ifdef __ANDROID__
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+#endif
     //e6y: anti-aliasing
     gld_MultisamplingInit();
 
@@ -1220,7 +1237,19 @@ void I_UpdateVideoMode(void)
       SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
       SCREENWIDTH, SCREENHEIGHT,
       init_flags);
+
+
+#ifdef __ANDROID__
+    if(!sdl_window)
+        I_Error("Could not create SDL window [%s]", SDL_GetError());
+#endif
+
     sdl_glcontext = SDL_GL_CreateContext(sdl_window);
+
+#ifdef __ANDROID__
+    if(!sdl_glcontext)
+        I_Error("Could not create SDL context [%s]", SDL_GetError());
+#endif
 
     gld_CheckHardwareGamma();
 #endif
@@ -1231,6 +1260,12 @@ void I_UpdateVideoMode(void)
 
     if (render_vsync && !novsync)
       flags |= SDL_RENDERER_PRESENTVSYNC;
+
+#ifdef __ANDROID__
+    flags = SDL_RENDERER_ACCELERATED;
+
+    SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 ); // Defaults to 24 which is not needed and fails on old Tegras
+#endif
 
     sdl_window = SDL_CreateWindow(
       PACKAGE_NAME " " PACKAGE_VERSION,
@@ -1250,9 +1285,17 @@ void I_UpdateVideoMode(void)
       actualheight = SCREENHEIGHT;
     }
 
+#ifndef __ANDROID__
     SDL_SetWindowMinimumSize(sdl_window, SCREENWIDTH, actualheight);
+#endif
+
+#ifdef __ANDROID__ //Fill screen
+    if( M_CheckParm("-android_aspect") )
+#endif    
     SDL_RenderSetLogicalSize(sdl_renderer, SCREENWIDTH, actualheight);
 
+
+#ifndef __ANDROID__
     // [FG] make sure initial window size is always >= 640x480
     if (SCREENWIDTH <= 320 && SCREENHEIGHT <= 240 && screen_multiply == 1)
     {
@@ -1267,9 +1310,14 @@ void I_UpdateVideoMode(void)
 
     // [FG] force integer scales
     SDL_RenderSetIntegerScale(sdl_renderer, integer_scaling);
+#endif
 
     screen = SDL_CreateRGBSurface(0, SCREENWIDTH, SCREENHEIGHT, V_GetNumPixelBits(), 0, 0, 0, 0);
+#ifdef __ANDROID__
+    buffer = SDL_CreateRGBSurface(0, SCREENWIDTH, SCREENHEIGHT, 32, 0xff << 0, 0xff << 8, 0xff << 16, 0xff << 24);
+#else
     buffer = SDL_CreateRGBSurface(0, SCREENWIDTH, SCREENHEIGHT, 32, 0, 0, 0, 0);
+#endif
     SDL_FillRect(buffer, NULL, 0);
 
     sdl_texture = SDL_CreateTextureFromSurface(sdl_renderer, buffer);
@@ -1278,6 +1326,9 @@ void I_UpdateVideoMode(void)
       I_Error("Couldn't set %dx%d video mode [%s]", SCREENWIDTH, SCREENHEIGHT, SDL_GetError());
     }
   }
+
+    void initialize_gl4es( void );
+    initialize_gl4es();
 
   if (sdl_video_window_pos)
   {

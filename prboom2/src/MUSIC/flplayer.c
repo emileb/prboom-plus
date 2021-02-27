@@ -65,6 +65,10 @@ const music_player_t fl_player =
 
 #else // HAVE_LIBFLUIDSYNTH
 
+#ifdef __ANDROID__
+#define FLUID_FAILED -1
+#endif
+
 #include <fluidsynth.h>
 #include "i_sound.h" // for snd_soundfont, mus_fluidsynth_gain
 #include "i_system.h" // for I_FindFile()
@@ -360,7 +364,9 @@ static void writesysex (unsigned char *data, int len)
   sysexbufflen += len;
   if (sysexbuff[sysexbufflen - 1] == 0xf7) // terminator
   { // pass len-1 because fluidsynth does NOT want the final F7
-    fluid_synth_sysex (f_syn, (const char *)sysexbuff, sysexbufflen - 1, NULL, NULL, &didrespond, 0);
+#ifndef __ANDROID__
+    fluid_synth_sysex (f_syn, sysexbuff, sysexbufflen - 1, NULL, NULL, &didrespond, 0);
+#endif
     sysexbufflen = 0;
   }
   if (!didrespond)

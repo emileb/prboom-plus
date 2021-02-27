@@ -902,7 +902,15 @@ void I_InitMusic(void)
 #ifdef HAVE_MIXER
   if (!music_tmp) {
 #ifndef _WIN32
+
+#ifdef __ANDROID__
+    music_tmp = malloc(256);
+    sprintf(music_tmp,"./");
+    return;
+#else
     music_tmp = strdup("/tmp/"PACKAGE_TARNAME"-music-XXXXXX");
+#endif
+
     {
       int fd = mkstemp(music_tmp);
       if (fd<0) {

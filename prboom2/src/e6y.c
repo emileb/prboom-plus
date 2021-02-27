@@ -489,6 +489,11 @@ void M_ChangeMouseLook(void)
   else
     gl_drawskys = gl_skymode;
 #endif // GL_DOOM
+
+#ifdef __ANDROID__
+ gl_drawskys = skytype_screen; // Other sky types do not work
+ //gl_drawskys = skytype_skydome;
+#endif
 }
 
 void M_ChangeMouseInvert(void)

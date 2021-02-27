@@ -176,6 +176,38 @@ void gld_InitOpenGLVersion(void)
   }
 }
 
+#ifdef __ANDROID__
+#include <dlfcn.h>
+static void * GetProcAddress(const char* name)
+{
+
+	static void *glesLib = NULL;
+
+	if(!glesLib)
+	{
+		int flags = RTLD_LOCAL | RTLD_NOW;
+
+		glesLib = dlopen("libGL4ES.so", flags);
+	}
+
+	void * ret = NULL;
+	ret =  dlsym(glesLib, name);
+
+	if(!ret)
+	{
+		//LOGI("Failed to load: %s", name);
+	}
+	else
+	{
+		//LOGI("Loaded %s func OK", name);
+	}
+
+	return ret;
+}
+
+#define SDL_GL_GetProcAddress GetProcAddress
+#endif
+
 void gld_InitOpenGL(dboolean compatibility_mode)
 {
   GLenum texture;

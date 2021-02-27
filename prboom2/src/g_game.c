@@ -460,6 +460,10 @@ static int G_NextWeapon(int direction)
   return weapon_order_table[i].weapon_num;
 }
 
+#ifdef __ANDROID__
+void Mobile_IN_Move(ticcmd_t* cmd );
+#endif
+
 void G_BuildTiccmd(ticcmd_t* cmd)
 {
   int strafe;
@@ -766,6 +770,10 @@ void G_BuildTiccmd(ticcmd_t* cmd)
 
     cmd->angleturn = (((cmd->angleturn + 128) >> 8) << 8);
   }
+
+#ifdef __ANDROID__
+    Mobile_IN_Move( cmd );
+#endif
 
   upmove = 0;
   if (gamekeydown[key_flyup])
@@ -1080,6 +1088,11 @@ void G_Ticker (void)
 {
   int i;
   static gamestate_t prevgamestate;
+
+#ifdef __ANDROID__
+    void Android_SendKeys( void );
+    Android_SendKeys();
+#endif
 
   // CPhipps - player colour changing
   if (!demoplayback && mapcolor_plyr[consoleplayer] != mapcolor_me) {

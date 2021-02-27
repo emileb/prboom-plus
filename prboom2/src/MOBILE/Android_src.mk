@@ -6,7 +6,7 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE    := prboom
 
-LOCAL_CFLAGS :=  -DHAVE_JWZGLES -DGL_DOOM -DENGINE_NAME=\"prboom\" -fsigned-char  -DHAVE_CONFIG_H -Dstricmp=strcasecmp -DPRBOOM_DOOM
+LOCAL_CFLAGS :=  -DHAVE_JWZGLES -DGL_DOOM -DUSE_SHADERS  -DENGINE_NAME=\"prboom\" -fsigned-char  -DHAVE_CONFIG_H -Dstricmp=strcasecmp -DPRBOOM_DOOM
 
 
 LOCAL_C_INCLUDES :=     $(SDL_INCLUDE_PATHS)  \
@@ -15,6 +15,8 @@ LOCAL_C_INCLUDES :=     $(SDL_INCLUDE_PATHS)  \
                         $(TOP_DIR)/Clibs_OpenTouch \
                         $(TOP_DIR)/Clibs_OpenTouch/idtech1 \
                         $(LOCAL_PATH)/MOBILE  \
+                        $(TOP_DIR)/gl4es/include \
+                        $(TOP_DIR)\AudioLibs_OpenTouch\fluidsynth\include\
 
 
 
@@ -168,7 +170,7 @@ LOCAL_LDLIBS += -llog -lz -lGLESv1_CM
 
 LOCAL_STATIC_LIBRARIES += jwzgles  fluidsynth-static SDL2_net  logwritter
 
-LOCAL_SHARED_LIBRARIES := touchcontrols SDL2 SDL2_mixer SDL2_image core_shared saffal
+LOCAL_SHARED_LIBRARIES := touchcontrols SDL2 SDL2_mixer SDL2_image core_shared saffal GL4ES
 
 include $(BUILD_SHARED_LIBRARY)
 

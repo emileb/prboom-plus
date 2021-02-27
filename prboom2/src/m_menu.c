@@ -679,8 +679,13 @@ void M_DrawNewGame(void)
 /* cph - make `New Game' restart the level in a netgame */
 static void M_RestartLevelResponse(int ch)
 {
+#ifdef __ANDROID__
+  if ((ch != 'y') && ( ch != key_enter))
+    return;
+#else
   if (ch != 'y')
     return;
+#endif
 
   if (demorecording)
     exit(0);
@@ -720,8 +725,13 @@ void M_NewGame(int choice)
 // CPhipps - static
 static void M_VerifyNightmare(int ch)
 {
+#ifdef __ANDROID__
+  if ((ch != 'y') && ( ch != key_enter))
+    return;
+#else
   if (ch != 'y')
     return;
+#endif
 
   G_DeferedInitNew(nightmare,EpiMenuEpi[epiChoice], EpiMenuMap[epiChoice]);
   M_ClearMenus ();
@@ -844,7 +854,11 @@ static char *forced_loadgame_message;
 
 static void M_VerifyForcedLoadGame(int ch)
 {
+#ifdef __ANDROID__
+  if ((ch=='y') || (ch==key_enter))
+#else
   if (ch=='y')
+#endif
     G_ForcedLoadGame();
   free(forced_loadgame_message);    // free the message strdup()'ed below
   M_ClearMenus();
@@ -1120,8 +1134,13 @@ int quitsounds2[8] =
 
 static void M_QuitResponse(int ch)
 {
+#ifdef __ANDROID__
+  if ((ch != 'y') && ( ch != key_enter))
+    return;
+#else
   if (ch != 'y')
     return;
+#endif
   
   //e6y: Optional removal of a quit sound
   if ((!netgame && showendoom) // killough 12/98
@@ -1158,8 +1177,11 @@ void M_QuitDOOM(int choice)
     sprintf(endstring,"%s\n\n%s",s_DOSY, endmsg[0] );
   else         // killough 1/18/98: fix endgame message calculation:
     sprintf(endstring,"%s\n\n%s", endmsg[gametic%(NUM_QUITMESSAGES-1)+1], s_DOSY);
-
+#ifndef __ANDROID__
   M_StartMessage(endstring,M_QuitResponse,true);
+#else
+    M_QuitResponse( 'y' ); // Don't bother with confirmation
+#endif
 }
 
 /////////////////////////////
@@ -1410,8 +1432,12 @@ void M_QuickSave(void)
     quickSaveSlot = -2; // means to pick a slot now
     return;
   }
+#ifndef __ANDROID__
   sprintf(tempstring,s_QSPROMPT,savegamestrings[quickSaveSlot]); // Ty 03/27/98 - externalized
   M_StartMessage(tempstring,M_QuickSaveResponse,true);
+#else
+    M_QuickSaveResponse( 'y' );
+#endif
 }
 
 /////////////////////////////
@@ -1442,8 +1468,12 @@ void M_QuickLoad(void)
     M_StartMessage(s_QSAVESPOT,NULL,false); // Ty 03/27/98 - externalized
     return;
   }
+#ifndef __ANDROID__
   sprintf(tempstring,s_QLPROMPT,savegamestrings[quickSaveSlot]); // Ty 03/27/98 - externalized
   M_StartMessage(tempstring,M_QuickLoadResponse,true);
+#else
+  M_QuickLoadResponse( 'y' );
+#endif
 }
 
 /////////////////////////////
@@ -1453,8 +1483,13 @@ void M_QuickLoad(void)
 
 static void M_EndGameResponse(int ch)
 {
+#ifdef __ANDROID__
+  if ((ch != 'y') && ( ch != key_enter))
+    return;
+#else
   if (ch != 'y')
     return;
+#endif
 
   // killough 5/26/98: make endgame quit if recording or playing back demo
   if (demorecording || singledemo)
@@ -3156,9 +3191,13 @@ setup_menu_t* gen_settings[] =
 
 static const char *videomodes[] = {
   "8bit","15bit","16bit", "32bit",
+
+#ifndef __ANDROID__ // Don't allow change of mode to OpenGL when in SW
 #ifdef GL_DOOM
   "OpenGL",
 #endif
+#endif
+
   NULL};
 
 static const char *gltexformats[] = {
@@ -3447,6 +3486,14 @@ void M_ChangeTextureParams(void)
 
 void M_General(int choice)
 {
+#ifdef __ANDROID__ // Do not allow to change mode or resolution when in OpenGL mode
+  if (V_GetMode() == VID_MODEGL)
+  {
+  	gen_settings1[1].m_flags = S_SKIP;
+  	gen_settings1[2].m_flags = S_SKIP;
+  }
+#endif
+
   M_SetupNextMenu(&GeneralDef);
 
   setup_active = true;
@@ -4670,7 +4717,11 @@ dboolean M_Responder (event_t* ev) {
 
   if (messageToPrint) {
     if (messageNeedsInput == true &&
+#ifdef __ANDROID__
+  !(ch == ' ' || ch == 'n' || ch == 'y' || ch == key_enter || ch == key_escape)) // phares
+#else
   !(ch == ' ' || ch == 'n' || ch == 'y' || ch == key_escape)) // phares
+#endif
       return false;
 
     menuactive = messageLastMenuActive;
