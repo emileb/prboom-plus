@@ -358,6 +358,7 @@ void I_SafeExit(int rc)
     {
       has_exited=rc ? 2 : 1;
 #ifdef __ANDROID__
+	Mix_HaltMusic();
 	Z_Close();
 	I_Quit();
 #endif
