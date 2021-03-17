@@ -447,11 +447,11 @@ void I_SafeExit(int rc)
 
     if (rc == 0 || entry->run_on_error)
     {
-<<<<<<< HEAD
       entry->func();
 #ifdef __ANDROID__
-      Z_Close();
-	  I_Quit();
+	Mix_HaltMusic();
+	Z_Close();
+	I_Quit();
 #endif
     }
   }
