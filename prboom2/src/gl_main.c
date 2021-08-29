@@ -860,6 +860,12 @@ void gld_DrawLine_f(float x0, float y0, float x1, float y1, int BaseColor)
             (float)playpal[3*BaseColor+1]/255.0f,
             (float)playpal[3*BaseColor+2]/255.0f,
             alpha);
+
+#ifdef __ANDROID__
+  float lineWidthScaled = (desired_screenwidth / 640) * 2; // Scale to 640, but also double because phone screens are small
+  glLineWidth(lineWidthScaled);
+#endif
+
   glBegin(GL_LINES);
     glVertex2f( x0, y0 );
     glVertex2f( x1, y1 );
