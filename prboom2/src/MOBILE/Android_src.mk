@@ -6,7 +6,7 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE    := prboom
 
-LOCAL_CFLAGS :=  -DHAVE_JWZGLES -DGL_DOOM -DUSE_SHADERS  -DENGINE_NAME=\"prboom\" -fsigned-char  -DHAVE_CONFIG_H -Dstricmp=strcasecmp -DPRBOOM_DOOM
+LOCAL_CFLAGS :=  -DHAVE_JWZGLES -DGL_DOOM -DUSE_SHADERS  -DENGINE_NAME=\"prboom\" -fsigned-char -DHAVE_DIRENT_H -DHAVE_CONFIG_H -Dstricmp=strcasecmp -DPRBOOM_DOOM
 
 
 LOCAL_C_INCLUDES :=     $(SDL_INCLUDE_PATHS)  \
@@ -40,6 +40,7 @@ LOCAL_C_INCLUDES :=     $(SDL_INCLUDE_PATHS)  \
     info.c \
     i_capture.c \
     i_pcsound.c \
+    i_glob.c \
     lprintf.c \
     md5.c \
     m_argv.c \
@@ -138,6 +139,8 @@ DOOMMUSIC_SOURCES = \
     MUSIC/opl_queue.c \
     MUSIC/portmidiplayer.c \
     MUSIC/vorbisplayer.c \
+    MUSIC/alsaplayer.c
+
 
 GL_SRC = \
     gl_clipper.c \

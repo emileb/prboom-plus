@@ -431,6 +431,9 @@ dboolean HasTrailingSlash(const char* dn)
 #define PATH_SEPARATOR ':'
 #endif
 
+#ifdef __ANDROID__
+#define PRBOOMDATADIR "./res/"
+#endif
 char* I_FindFileInternal(const char* wfname, const char* ext, dboolean isStatic)
 {
   // lookup table of directories to search
@@ -451,9 +454,6 @@ char* I_FindFileInternal(const char* wfname, const char* ext, dboolean isStatic)
     {"/usr/share/games/doom"},
     {"/usr/local/share/doom"},
     {"/usr/share/doom"},
-#ifdef __ANDROID__
-    {"./res/"},
-#endif
   }, *search;
 
   static size_t num_search;
