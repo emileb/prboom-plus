@@ -16,6 +16,9 @@ LOCAL_C_INCLUDES +=     $(LOCAL_PRBOOM_PATH)/MOBILE \
 
 LOCAL_SRC_FILES = $(lib$(STATIC_LIB)_a_SOURCES)
 
+#Strip unused functions/data
+LOCAL_CFLAGS += -fvisibility=hidden -fdata-sections -ffunction-sections
+
 include $(BUILD_STATIC_LIBRARY)
 
 
