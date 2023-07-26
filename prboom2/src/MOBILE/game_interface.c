@@ -173,6 +173,9 @@ void PortableAction(int state, int action)
 		case PORT_ACT_PREV_WEP:
 			PortableKeyEvent(state,key_prevweapon,0);
 			break;
+		case PORT_ACT_JUMP:
+			PortableKeyEvent(state,key_flyup,0);
+			break;
 		case PORT_ACT_MAP:
 			PortableKeyEvent(state,key_map,0);
 			break;
