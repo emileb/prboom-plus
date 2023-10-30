@@ -342,15 +342,23 @@ const char* I_GetTempDir(void)
 // cph - V.Aguilar (5/30/99) suggested return ~/.lxdoom/, creating
 //  if non-existant
 // cph 2006/07/23 - give prboom+ its own dir
-#ifdef __ANDROID__
-static const char prboom_dir[] = {"/user_files/prboom-plus"}; // Not hidden so not to confuse mobile users
-#else
-static const char prboom_dir[] = {"prboom-plus"};
-#endif
 
+static const char prboom_dir[] = {"prboom-plus"};
 
 const char *I_DoomExeDir(void)
 {
+#ifdef __ANDROID__
+    static char *base;
+    if (!base)        // cache multiple requests
+    {
+      base = malloc(200);
+      char *home = M_getenv("USER_FILES");
+      snprintf(base, 200, "%s/%s", home, prboom_dir);
+      mkdir(base, S_IRUSR | S_IWUSR | S_IXUSR);
+    }
+    return base;
+#else
+
   static char *base;
   struct stat data_dir;
 
@@ -385,6 +393,7 @@ const char *I_DoomExeDir(void)
 //    mkdir(base, S_IRUSR | S_IWUSR | S_IXUSR);
     }
   return base;
+#endif
 }
 
 const char *I_GetTempDir(void)
