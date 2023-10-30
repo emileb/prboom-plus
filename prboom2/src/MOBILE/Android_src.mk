@@ -98,6 +98,7 @@ LOCAL_C_INCLUDES :=     $(SDL_INCLUDE_PATHS)  \
     z_zone.c \
     w_mmap.c \
     d_client.c \
+    m_io.c \
 
 
 MUS2MID_SRC = \
