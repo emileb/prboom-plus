@@ -8,9 +8,6 @@
 
 #include "game_interface.h"
 
-//used by i_sound.c
-int ANDROID_SAMPLECOUNT = 1024;
-
 // FIFO STUFF ////////////////////
 // Copied from FTEQW, I don't know if this is thread safe, but it's safe enough for a game :)
 #define EVENTQUEUELENGTH 128
@@ -253,7 +250,7 @@ void PortableAction(int state, int action)
 
 // =================== FORWARD and SIDE MOVMENT ==============
 
-static float forwardmove, sidemove; //Joystick mode
+static float forwardmove_android, sidemove_android; //Joystick mode
 
 void PortableMoveFwd(float fwd)
 {
@@ -262,7 +259,7 @@ void PortableMoveFwd(float fwd)
 	else if (fwd < -1)
 		fwd = -1;
 
-	forwardmove = fwd;
+	forwardmove_android = fwd;
 }
 
 void PortableMoveSide(float strafe)
@@ -272,7 +269,7 @@ void PortableMoveSide(float strafe)
 	else if (strafe < -1)
 		strafe = -1;
 
-	sidemove = strafe;
+	sidemove_android = strafe;
 }
 
 void PortableMove(float fwd, float strafe)
@@ -330,7 +327,7 @@ void PortableCommand(const char * cmd){}
 void PortableInit(int argc,const char ** argv){
 
 	extern int main_android(int argc, char **argv);
-	main_android(argc,argv);
+	main_android(argc, ( char **)argv);
 }
 
 
@@ -382,11 +379,19 @@ void Mobile_IN_Move(ticcmd_t* cmd )
     int blockMove = blockGamepad() & ANALOGUE_AXIS_FWD;
     int blockLook = blockGamepad() & ANALOGUE_AXIS_PITCH;
 
-
     if( !blockMove )
     {
-	    cmd->forwardmove  += forwardmove * forwardmove_normal[1];
-	    cmd->sidemove  += sidemove   * sidemove_normal[1];
+        float fwdSpeed =  forwardmove_android;
+        float sideSpeed = sidemove_android;
+
+        if(!isPlayerRunning())
+        {
+            fwdSpeed = fwdSpeed / 2;
+            sideSpeed = sideSpeed /2;
+        }
+
+	    cmd->forwardmove  += fwdSpeed * forwardmove_normal[1];
+	    cmd->sidemove  += sideSpeed  * sidemove_normal[1];
     }
 
     if( !blockLook )
