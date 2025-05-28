@@ -16,7 +16,7 @@ LOCAL_C_INCLUDES :=     $(SDL_INCLUDE_PATHS)  \
                         $(TOP_DIR)/Clibs_OpenTouch/idtech1 \
                         $(LOCAL_PATH)/MOBILE  \
                         $(TOP_DIR)/gl4es/include \
-                        $(TOP_DIR)\AudioLibs_OpenTouch\fluidsynth\include\
+                        $(TOP_DIR)/AudioLibs_OpenTouch/fluidsynth/include\
 
  COMMON_SRC = \
     am_map.c \
