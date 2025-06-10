@@ -353,6 +353,14 @@ touchscreemode_t PortableGetScreenMode()
     }
 }
 
+extern int  autorun;
+
+bool PortableSetAlwaysRun(bool run)
+{
+    autorun = run;
+    return false;
+}
+
 void Mobile_AM_controls(double *zoom, fixed_t *pan_x, fixed_t *pan_y )
 {
 	if (am_zoom)
