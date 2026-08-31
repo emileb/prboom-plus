@@ -84,6 +84,9 @@
 
 #ifdef GL_DOOM
 #include "gl_struct.h"
+#if defined(GL_DOOM) && defined(__ANDROID__)
+#include "gl_intern.h"
+#endif
 #endif
 
 #include "e6y.h"//e6y
@@ -635,6 +638,7 @@ void I_FinishUpdate (void)
   SDL_RenderPresent(sdl_renderer);
 
 #ifdef __ANDROID__ // The touch controls change the viewport, call this to fix. This function does not exist in SDL2
+      int SDL_ForceupdateViewport(SDL_Renderer * renderer);
       SDL_ForceupdateViewport(sdl_renderer);
 #endif
 }

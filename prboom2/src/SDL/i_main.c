@@ -68,6 +68,9 @@ typedef BOOL (WINAPI *SetAffinityFunc)(HANDLE hProcess, DWORD mask);
 #include "m_misc.h"
 #include "i_sound.h"
 #include "i_main.h"
+#ifdef __ANDROID__
+#include "SDL_mixer.h"
+#endif
 #include "r_fps.h"
 #include "lprintf.h"
 
